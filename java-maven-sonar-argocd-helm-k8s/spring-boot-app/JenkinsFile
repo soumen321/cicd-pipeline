@@ -24,7 +24,7 @@ pipeline {
     }
     stage('SonarQubeAnalysis'){
      steps{
-         withSonarQubeEnv('sonarqube'){
+         withSonarQubeEnv('sonar-scanner'){
         sh'''$SCANNER_HOME/bin/sonar-scanner-Dsonar.projectName=SpringApp
         Dsonar.projectKey=SpringAppe -Dsonar.java.binaries=.'''
          }
