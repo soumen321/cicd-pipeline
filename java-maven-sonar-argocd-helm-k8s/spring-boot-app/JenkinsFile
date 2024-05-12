@@ -4,6 +4,9 @@ pipeline {
       image 'abhishekf5/maven-abhishek-docker-agent:v1'
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
+    environment{
+     SCANNER_HOME=tool'sonar-scanner'
+     }
   }
   stages {
     stage('Checkout') {
@@ -19,16 +22,15 @@ pipeline {
         sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn clean package'
       }
     }
-    stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://localhost:9000"
-      }
-      steps {
-        withCredentials([string(credentialsId: 'sonarqube', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && mvn sonar:sonar -Dsonar.login=$SONAR_AUTH_TOKEN -Dsonar.host.url=${SONAR_URL}'
-        }
-      }
-    }
+    stage('SonarQubeAnalysis'){
+     steps{
+         withSonarQubeEnv('sonarqube'){
+        sh'''$SCANNER_HOME/bin/sonar-scanner-Dsonar.projectName=SpringApp
+        Dsonar.projectKey=SpringAppe\-Dsonar.java.binaries=.'''
+         }
+     }
+   }
+
     stage('Build and Push Docker Image') {
       environment {
         DOCKER_IMAGE = "abhishekf5/ultimate-cicd:${BUILD_NUMBER}"
