@@ -24,8 +24,10 @@ pipeline {
         SONAR_URL = "http://localhost:9000"
       }
       steps {
-       withSonarQubeEnv(credentialsId: 'sonarqube') {
-         sh 'mvn clean package sonar:sonar'
+        script{
+           withSonarQubeEnv(credentialsId: 'sonarqube') {
+             sh 'mvn clean package sonar:sonar'
+          }
         }
       }
     }
